@@ -167,3 +167,29 @@ FROM us_counties_pop_est_2019;
 
 SELECT mode() WITHIN GROUP (ORDER BY births_2019)
 FROM us_counties_pop_est_2019;
+
+
+-- Try it yourself
+--Q1
+SELECT 3.14 * (5 ^ 2);
+
+-- Q2
+SELECT  county_name,
+        ROUND(births_2019::numeric(7,2)/deaths_2019,2) as ratio
+FROM us_counties_pop_est_2019
+WHERE state_name = 'New York'
+;
+
+--Q3
+-- calculate median using percentile
+-- setting condition to NY and CA only
+-- decide which type of percentile to use depending on number of elements in the set
+SELECT count(*)
+FROM us_counties_pop_est_2019
+;
+SELECT state_name,
+       percentile_cont(0.5) WITHIN GROUP(order by pop_est_2019) as county_median
+FROM us_counties_pop_est_2019
+WHERE state_name IN ('New York', 'California')
+GROUP BY state_name
+;
