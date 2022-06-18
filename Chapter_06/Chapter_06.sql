@@ -178,6 +178,7 @@ SELECT  county_name,
         ROUND(births_2019::numeric(7,2)/deaths_2019,2) as ratio
 FROM us_counties_pop_est_2019
 WHERE state_name = 'New York'
+ORDER BY ratio DESC
 ;
 
 --Q3

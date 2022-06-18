@@ -245,7 +245,7 @@ CREATE TABLE us_counties_pop_est_2010 (
 );
 
 COPY us_counties_pop_est_2010
-FROM 'C:\YourDirectory\us_counties_pop_est_2010.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_07/us_counties_pop_est_2010.csv'
 WITH (FORMAT CSV, HEADER);
 
 SELECT c2019.county_name,
@@ -260,3 +260,54 @@ FROM us_counties_pop_est_2019 AS c2019
 ON c2019.state_fips = c2010.state_fips
     AND c2019.county_fips = c2010.county_fips
 ORDER BY pct_change DESC;
+
+
+
+--TRY IT YOURSELF
+--Q1 
+SELECT 
+    c2010.state_name,
+    c2010.county_name,
+    ROUND((c2019.pop_est_2019::numeric - c2010.estimates_base_2010)*100/c2010.estimates_base_2010,1) AS pct_change
+FROM us_counties_pop_est_2010 AS c2010
+    JOIN us_counties_pop_est_2019 AS c2019
+    ON c2010.state_fips = c2019.state_fips
+    AND c2010.county_fips = c2019.county_fips
+ORDER BY pct_change ASC
+;
+
+--Q2
+
+SELECT '2010' as yr, state_fips, county_fips, region, state_name, county_name, estimates_base_2010 as pop
+FROM us_counties_pop_est_2010
+UNION
+SELECT '2019' as yr, state_fips, county_fips, region, state_name, county_name, pop_est_2019 as pop
+FROM us_counties_pop_est_2019
+ORDER BY state_name, county_name
+;
+
+--Q3
+WITH pct_change AS(
+SELECT 
+    c2010.state_name,
+    c2010.county_name,
+    ROUND((c2019.pop_est_2019::numeric - c2010.estimates_base_2010)*100/c2010.estimates_base_2010,1) AS pct_change
+FROM us_counties_pop_est_2010 AS c2010
+    JOIN us_counties_pop_est_2019 AS c2019
+    ON c2010.state_fips = c2019.state_fips
+    AND c2010.county_fips = c2019.county_fips
+ORDER BY pct_change ASC
+)
+
+SELECT state_name, 
+       percentile_cont(0.5) WITHIN GROUP(ORDER BY pct_change) as median
+from pct_change
+GROUP BY 1
+ORDER BY median DESC
+;
+
+
+
+
+
+
