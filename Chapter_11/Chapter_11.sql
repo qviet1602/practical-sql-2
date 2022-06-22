@@ -19,7 +19,7 @@ CREATE TABLE acs_2014_2018_stats (
 );
 
 COPY acs_2014_2018_stats
-FROM 'C:\YourDirectory\acs_2014_2018_stats.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_11/acs_2014_2018_stats.csv'
 WITH (FORMAT CSV, HEADER);
 
 SELECT * FROM acs_2014_2018_stats;
@@ -144,7 +144,7 @@ CREATE TABLE cbp_naics_72_establishments (
 );
 
 COPY cbp_naics_72_establishments
-FROM 'C:\YourDirectory\cbp_naics_72_establishments.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_11/cbp_naics_72_establishments.csv'
 WITH (FORMAT CSV, HEADER);
 
 SELECT *
@@ -177,7 +177,7 @@ CREATE TABLE us_exports (
 );
 
 COPY us_exports
-FROM 'C:\YourDirectory\us_exports.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_11/us_exports.csv'
 WITH (FORMAT CSV, HEADER);
 
 -- View the monthly citrus data
@@ -194,4 +194,42 @@ SELECT year, month, citrus_export_value,
        AS twelve_month_avg
 FROM us_exports
 ORDER BY year, month;
+
+
+
+
+-- TRY IT YOURSELF
+-- Q1
+
+SELECT
+    round(
+      corr(median_hh_income, pct_bachelors_higher)::numeric, 2
+      ) AS bachelors_income_r,
+    round(
+      corr(median_hh_income, pct_masters_higher)::numeric, 2
+      ) AS masters_income_r
+FROM acs_2014_2018_stats;
+
+--Q2
+SELECT 
+    year,
+    month,
+    soybeans_export_value,
+    SUM(soybeans_export_value) OVER (ORDER BY year,month
+    ROWS BETWEEN 11 PRECEDING AND CURRENT ROW) as twelve_month_sum
+FROM us_exports
+;
+
+--Q3
+SELECT
+    libname,
+    stabr,
+    county,
+    visits,
+    popu_lsa,
+    round(visits::numeric/popu_lsa*1000,2) as rate_visits,
+    RANK() OVER(ORDER BY round(visits::numeric/popu_lsa*1000,2) DESC) as rnk
+FROM pls_fy2018_libraries
+WHERE popu_lsa >= 250000
+;
 
