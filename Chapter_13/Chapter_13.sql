@@ -248,7 +248,7 @@ CREATE TABLE ice_cream_survey (
 );
 
 COPY ice_cream_survey
-FROM 'C:\YourDirectory\ice_cream_survey.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_13/ice_cream_survey.csv'
 WITH (FORMAT CSV, HEADER);
 
 -- view the data
@@ -288,7 +288,7 @@ CREATE TABLE temperature_readings (
 );
 
 COPY temperature_readings
-FROM 'C:\YourDirectory\temperature_readings.csv'
+FROM '/Users/jason1602/Documents/practical-sql-2/Chapter_13/temperature_readings.csv'
 WITH (FORMAT CSV, HEADER);
 
 -- Listing 13-19: Generating the temperature readings crosstab
@@ -354,3 +354,29 @@ SELECT station_name, max_temperature_group, count(*)
 FROM temps_collapsed
 GROUP BY station_name, max_temperature_group
 ORDER BY station_name, count(*) DESC;
+
+
+
+
+-- TRY IT YOURSELF
+--Q1
+
+WITH temps_collapsed (station_name, max_temperature_group) AS
+    (SELECT station_name,
+           CASE WHEN max_temp >= 90 THEN '90 or more'
+                WHEN max_temp BETWEEN 88 and 89 THEN '88-89'
+                WHEN max_temp BETWEEN 86 and 87 THEN '86-87'
+                WHEN max_temp BETWEEN 84 and 85 THEN '84-85'
+                WHEN max_temp BETWEEN 82 and 83 THEN '82-83' 
+                WHEN max_temp BETWEEN 80 and 81 THEN '80-81'
+                ELSE '79 or less'
+            END
+    FROM temperature_readings
+    WHERE station_name LIKE 'WAIKIKI%')
+
+SELECT station_name, max_temperature_group, count(*)
+FROM temps_collapsed
+GROUP BY station_name, max_temperature_group
+ORDER BY station_name, count(*) DESC;
+
+--Q2
